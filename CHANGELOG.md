@@ -1,3 +1,13 @@
+<a name="3.0.2"></a>
+## [3.0.2](https://github.com/adonisjs/adonis-auth/compare/v3.0.1...v3.0.2) (2018-02-16)
+
+
+### Bug Fixes
+
+* **instructions:** do not log errors ([793bc62](https://github.com/adonisjs/adonis-auth/commit/793bc62))
+
+
+
 <a name="3.0.1"></a>
 ## [3.0.1](https://github.com/adonisjs/adonis-auth/compare/v3.0.0...v3.0.1) (2018-02-07)
 
