@@ -51,7 +51,7 @@ async function makeConfigFile (cli) {
 
     cli.command.completed('create', 'config/auth.js')
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
@@ -63,7 +63,7 @@ async function copyUserModel (cli) {
     )
     cli.command.completed('create', 'Models/User.js')
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
@@ -75,7 +75,7 @@ async function copyTokenModel (cli) {
     )
     cli.command.completed('create', 'Models/Token.js')
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
@@ -87,7 +87,7 @@ async function copyUserHook (cli) {
     )
     cli.command.completed('create', 'Models/Hooks/User.js')
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
@@ -100,7 +100,7 @@ async function copyUserMigration (cli) {
     )
     cli.command.completed('create', migrationsFile.replace(cli.helpers.appRoot(), '').replace(path.sep, ''))
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
@@ -113,7 +113,7 @@ async function copyTokenMigration (cli) {
     )
     cli.command.completed('create', migrationsFile.replace(cli.helpers.appRoot(), '').replace(path.sep, ''))
   } catch (error) {
-    console.log(error)
+    // ignore error
   }
 }
 
