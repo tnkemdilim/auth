@@ -118,15 +118,15 @@ test.group('Auth', (group) => {
 		/**
 		 * Test attempt
 		 */
-		mockAction(guardInstance, 'attempt', function (
-			uid: string,
-			secret: string,
-			rememberMe: boolean
-		) {
-			assert.equal(uid, 'foo')
-			assert.equal(secret, 'secret')
-			assert.equal(rememberMe, true)
-		})
+		mockAction(
+			guardInstance,
+			'attempt',
+			function (uid: string, secret: string, rememberMe: boolean) {
+				assert.equal(uid, 'foo')
+				assert.equal(secret, 'secret')
+				assert.equal(rememberMe, true)
+			}
+		)
 		await auth.attempt('foo', 'secret', true)
 
 		/**

@@ -309,9 +309,10 @@ export function getLucidProvider<User extends LucidProviderModel>(
 ) {
 	const defaults = getLucidProviderConfig(config)
 	const normalizedConfig = Object.assign(defaults, config) as LucidProviderConfig<User>
-	return (new LucidProvider(application, normalizedConfig) as unknown) as LucidProviderContract<
-		User
-	>
+	return (new LucidProvider(
+		application,
+		normalizedConfig
+	) as unknown) as LucidProviderContract<User>
 }
 
 /**
