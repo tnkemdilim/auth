@@ -2,10 +2,7 @@
 > Fully blown authentication provider for Adonis framework
 
 [![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Appveyor][appveyor-image]][appveyor-url]
-[![Coveralls][coveralls-image]][coveralls-url]
-
+[![Build Status][circleci-image]][circleci-url]
 
 Adonisjs auth is an authentication provider to add authentication layer to your apps.
 
@@ -79,16 +76,8 @@ test.failing('2 + 2 is always 4, but add method returns 6', (assert) => {
 
 Now since the `add` method has a bug, it will return `6` instead of `4`. But the build will pass.
 
-[appveyor-image]: https://img.shields.io/appveyor/ci/thetutlage/adonis-auth/master.svg?style=flat-square
-
-[appveyor-url]: https://ci.appveyor.com/project/thetutlage/adonis-auth
-
-[npm-image]: https://img.shields.io/npm/v/@adonisjs/auth.svg?style=flat-square
+[npm-image]: https://img.shields.io/npm/v/@adonisjs/auth/legacy.svg?style=for-the-badge
 [npm-url]: https://npmjs.org/package/@adonisjs/auth
 
-[travis-image]: https://img.shields.io/travis/adonisjs/adonis-auth/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/adonisjs/adonis-auth
-
-[coveralls-image]: https://img.shields.io/coveralls/adonisjs/adonis-auth/develop.svg?style=flat-square
-
-[coveralls-url]: https://coveralls.io/github/adonisjs/adonis-auth
+[circleci-image]: https://img.shields.io/circleci/project/github/adonisjs/auth/legacy.svg?style=for-the-badge&logo=circleci
+[circleci-url]: https://circleci.com/gh/adonisjs/auth "circleci"
