@@ -41,7 +41,7 @@ test.group('Middleware | Auth', (group) => {
       ctx.session = helpers.getSession(req, res)
 
       ctx.auth.authenticator('session')
-      ctx.auth._authenticatorsPool['session'].loginIfCan = function () {
+      ctx.auth._authenticatorsPool.session.loginIfCan = function () {
         fnCalled = true
       }
 

@@ -131,11 +131,13 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header (key) {
-        return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+    basic.setCtx({
+      request: {
+        header (key) {
+          return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+        }
       }
-    } })
+    })
 
     const isLogged = await basic.check()
     assert.isTrue(isLogged)
@@ -162,14 +164,16 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return null
-      },
-      input () {
-        return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+    basic.setCtx({
+      request: {
+        header () {
+          return null
+        },
+        input () {
+          return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+        }
       }
-    } })
+    })
 
     const isLogged = await basic.check()
     assert.isTrue(isLogged)
@@ -199,11 +203,13 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return `Basic ${Buffer.from('foo@bar.com:supersecret').toString('base64')}`
+    basic.setCtx({
+      request: {
+        header () {
+          return `Basic ${Buffer.from('foo@bar.com:supersecret').toString('base64')}`
+        }
       }
-    } })
+    })
 
     try {
       await basic.check()
@@ -234,11 +240,13 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+    basic.setCtx({
+      request: {
+        header () {
+          return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+        }
       }
-    } })
+    })
 
     const user = await basic.getUser()
     assert.instanceOf(user, User)
@@ -295,11 +303,13 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+    basic.setCtx({
+      request: {
+        header () {
+          return `Basic ${Buffer.from('foo@bar.com:secret').toString('base64')}`
+        }
       }
-    } })
+    })
 
     const isLogged = await basic.loginIfCan()
     assert.isTrue(isLogged)
@@ -327,14 +337,16 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return null
-      },
-      input () {
-        return null
+    basic.setCtx({
+      request: {
+        header () {
+          return null
+        },
+        input () {
+          return null
+        }
       }
-    } })
+    })
 
     const isLogged = await basic.loginIfCan()
     assert.isFalse(isLogged)
@@ -362,14 +374,16 @@ test.group('Schemes - BasicAuth', (group) => {
 
     const basic = new BasicAuth()
     basic.setOptions(config, lucid)
-    basic.setCtx({ request: {
-      header () {
-        return `Basic ${Buffer.from('foo@bar.com:invalidsecret').toString('base64')}`
-      },
-      input () {
-        return null
+    basic.setCtx({
+      request: {
+        header () {
+          return `Basic ${Buffer.from('foo@bar.com:invalidsecret').toString('base64')}`
+        },
+        input () {
+          return null
+        }
       }
-    } })
+    })
 
     const isLogged = await basic.loginIfCan()
     assert.isFalse(isLogged)

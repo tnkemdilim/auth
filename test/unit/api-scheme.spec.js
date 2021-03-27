@@ -172,7 +172,7 @@ test.group('Schemes - Api', (group) => {
     api.setCtx({
       request: {
         header (key) {
-          return `Bearer e22`
+          return 'Bearer e22'
         }
       }
     })
@@ -202,7 +202,7 @@ test.group('Schemes - Api', (group) => {
     api.setCtx({
       request: {
         header (key) {
-          return `Bearer 22`
+          return 'Bearer 22'
         }
       }
     })
@@ -235,7 +235,7 @@ test.group('Schemes - Api', (group) => {
     api.setCtx({
       request: {
         header (key) {
-          return `Bearer 22`
+          return 'Bearer 22'
         }
       }
     })
@@ -596,7 +596,7 @@ test.group('Schemes - Api', (group) => {
     api.setCtx({
       request: {
         header (key) {
-          return `Bearer e22`
+          return 'Bearer e22'
         }
       }
     })
@@ -690,7 +690,7 @@ test.group('Schemes - Api', (group) => {
     api.setCtx({
       request: {
         header (key) {
-          return `Token e22`
+          return 'Token e22'
         }
       }
     })

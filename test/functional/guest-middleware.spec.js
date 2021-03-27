@@ -57,6 +57,6 @@ test.group('Middleware | Guest', (group) => {
     })
 
     const { text } = await supertest(this.server).get('/').set('Cookie', 'adonis-auth=1').expect(403)
-    assert.equal(text, `E_GUEST_ONLY: Only guest user can access the route GET /`)
+    assert.equal(text, 'E_GUEST_ONLY: Only guest user can access the route GET /')
   })
 })

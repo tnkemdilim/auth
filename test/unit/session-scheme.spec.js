@@ -184,11 +184,13 @@ test.group('Schemes - Session', (group) => {
 
     session.setOptions(config, lucid)
 
-    session.setCtx({ session: {
-      put (key, value) {
-        httpSession = { key, value }
+    session.setCtx({
+      session: {
+        put (key, value) {
+          httpSession = { key, value }
+        }
       }
-    } })
+    })
 
     await User.create({ email: 'foo@bar.com', password: 'supersecret' })
     const user = await session.attempt('foo@bar.com', 'supersecret')
@@ -823,10 +825,12 @@ test.group('Schemes - Session', (group) => {
 
     session.setOptions(config, lucid)
 
-    session.setCtx({ session: {
-      put (key, value) {
+    session.setCtx({
+      session: {
+        put (key, value) {
+        }
       }
-    } })
+    })
 
     await User.create({ email: 'foo@bar.com', password: 'supersecret' })
     try {

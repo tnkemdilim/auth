@@ -140,7 +140,7 @@ test.group('Session', (group) => {
     })
 
     const { headers } = await supertest(this.server).get('/?email=foo@bar.com&password=secret').expect(200)
-    assert.match(headers['set-cookie'][0], new RegExp('adonis-remember-token='))
+    assert.match(headers['set-cookie'][0], /adonis-remember-token=/)
     const user = await ioc.use('App/Models/User').query().with('tokens').first()
     assert.isDefined(user.getRelated('tokens').first())
     assert.equal(user.getRelated('tokens').first().token, headers['set-cookie'][0].split('=')[1])
