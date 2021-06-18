@@ -11,6 +11,7 @@
 
 const uuid = require('uuid')
 const GE = require('@adonisjs/generic-exceptions')
+const _ = require('lodash')
 
 const BaseTokenScheme = require('./BaseToken')
 const CE = require('../Exceptions')
