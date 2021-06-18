@@ -34,6 +34,28 @@ const CE = require('../Exceptions')
  */
 class ApiScheme extends BaseTokenScheme {
   /**
+   * An object of API scheme configuration.
+   *
+   * @attribute apiOptions
+   * @type {Object|Null}
+   * @readOnly
+   */
+  get apiOptions() {
+    return _.get(this._config, 'options', {})
+  }
+
+  /**
+   * The token prefix.
+   *
+   * @attribute tokenPrefix
+   * @type {String|Null}
+   * @readOnly
+   */
+  get tokenPrefix() {
+    return _.get(this.apiOptions, 'tokenPrefix', '')
+  }
+
+  /**
    * Attempt to valid the user credentials and then
    * generates a new token for it.
    *
@@ -57,7 +79,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async attempt (uid, password) {
+  async attempt(uid, password) {
     const user = await this.validate(uid, password, true)
     return this.generate(user)
   }
@@ -84,7 +106,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async generate (user, tokenType = 'api_token', columns = {}) {
+  async generate(user, tokenType = 'api_token', columns = {}) {
     /**
      * Throw exception when user is not persisted to
      * database
@@ -101,7 +123,10 @@ class ApiScheme extends BaseTokenScheme {
      * Encrypting the token before giving it to the
      * user.
      */
-    const token = this.Encryption.encrypt(plainToken)
+    let token = this.Encryption.encrypt(plainToken)
+    if (this.tokenPrefix.length > 0) {
+      token = `${this.tokenPrefix}_${token}`
+    }
 
     return { type: 'bearer', token }
   }
@@ -129,7 +154,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async check (tokenType = 'api_token') {
+  async check(tokenType = 'api_token') {
     /**
      * User already exists for this request, so there is
      * no need to re-pull them from the database
@@ -138,10 +163,15 @@ class ApiScheme extends BaseTokenScheme {
       return true
     }
 
-    const token = this.getAuthHeader(['bearer', 'token'])
+    let token = this.getAuthHeader(['bearer', 'token'])
     if (!token) {
       throw CE.InvalidApiToken.invoke()
     }
+
+    /**
+     * Strip away configured prefix from token.
+     */
+    token = token.replace(`${this.tokenPrefix}_`, '');
 
     /**
      * Decrypting the token before querying
@@ -175,7 +205,7 @@ class ApiScheme extends BaseTokenScheme {
  *   await auth.loginIfCan()
    * ```
    */
-  async loginIfCan () {
+  async loginIfCan() {
     if (this.user) {
       return true
     }
@@ -207,7 +237,7 @@ class ApiScheme extends BaseTokenScheme {
    *
    * @return {Array}
    */
-  async listTokensForUser (user) {
+  async listTokensForUser(user) {
     if (!user) {
       return []
     }
@@ -234,7 +264,7 @@ class ApiScheme extends BaseTokenScheme {
    *
    * @return {void}
    */
-  async clientLogin (headerFn, sessionFn, tokenOrUser) {
+  async clientLogin(headerFn, sessionFn, tokenOrUser) {
     if (typeof (tokenOrUser) !== 'string') {
       const { token } = await this.generate(tokenOrUser)
       tokenOrUser = token

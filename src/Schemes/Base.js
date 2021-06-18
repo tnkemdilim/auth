@@ -22,7 +22,7 @@ const unimplementedMethods = ['login', 'logout', 'loginViaId']
  * @module Lucid
  */
 class BaseScheme {
-  constructor () {
+  constructor() {
     this._config = null
     this._serializerInstance = null
     this._instanceUser = null
@@ -36,7 +36,7 @@ class BaseScheme {
    * @readOnly
    * @type {String}
    */
-  get uidField () {
+  get uidField() {
     return this._config.uid
   }
 
@@ -47,7 +47,7 @@ class BaseScheme {
    * @readOnly
    * @type {String}
    */
-  get passwordField () {
+  get passwordField() {
     return this._config.password
   }
 
@@ -58,7 +58,7 @@ class BaseScheme {
    * @readOnly
    * @type {String}
    */
-  get scheme () {
+  get scheme() {
     return this._config.scheme
   }
 
@@ -70,7 +70,7 @@ class BaseScheme {
    * @readOnly
    * @type {String}
    */
-  get primaryKey () {
+  get primaryKey() {
     return this._serializerInstance.primaryKey
   }
 
@@ -82,7 +82,7 @@ class BaseScheme {
    * @readOnly
    * @type {String|Number}
    */
-  get primaryKeyValue () {
+  get primaryKeyValue() {
     return this._instanceUser[this.primaryKey]
   }
 
@@ -93,11 +93,11 @@ class BaseScheme {
    * @attribute user
    * @return {Mixed}
    */
-  get user () {
+  get user() {
     return this._instanceUser
   }
 
-  set user (user) {
+  set user(user) {
     this._instanceUser = user
   }
 
@@ -113,7 +113,7 @@ class BaseScheme {
    *
    * @chainable
    */
-  setOptions (config, serializerInstance) {
+  setOptions(config, serializerInstance) {
     this._config = config
     this._serializerInstance = serializerInstance
     return this
@@ -130,7 +130,7 @@ class BaseScheme {
    *
    * @chainable
    */
-  setCtx (ctx) {
+  setCtx(ctx) {
     this._ctx = ctx
     return this
   }
@@ -152,7 +152,7 @@ class BaseScheme {
    * }).attempt()
    * ```
    */
-  query (callback) {
+  query(callback) {
     this._serializerInstance.query(callback)
     return this
   }
@@ -183,7 +183,7 @@ class BaseScheme {
    * }
    * ```
    */
-  async validate (uid, password, returnUser = false) {
+  async validate(uid, password, returnUser = false) {
     const user = await this._serializerInstance.findByUid(typeof (uid) === 'string' ? uid : null)
     if (!user) {
       throw this.missingUserFor(uid)
@@ -211,7 +211,7 @@ class BaseScheme {
  *   await auth.getUser()
    * ```
    */
-  async getUser () {
+  async getUser() {
     await this.check()
     return this.user
   }
@@ -229,7 +229,7 @@ class BaseScheme {
    *
    * @return {String|Null}
    */
-  getAuthHeader (authTypes) {
+  getAuthHeader(authTypes) {
     authTypes = Array.isArray(authTypes) ? authTypes : ['bearer']
 
     const { request } = this._ctx
@@ -260,7 +260,7 @@ class BaseScheme {
    *
    * @return {UserNotFoundException}
    */
-  missingUserFor (uidValue, uid = this._config.uid, password = this._config.password) {
+  missingUserFor(uidValue, uid = this._config.uid, password = this._config.password) {
     const message = `Cannot find user with ${uid} as ${uidValue}`
     return CE.UserNotFoundException.invoke(message, uid, password, this.scheme)
   }
@@ -275,7 +275,7 @@ class BaseScheme {
    *
    * @return {PasswordMisMatchException}
    */
-  invalidPassword (password = this._config.password) {
+  invalidPassword(password = this._config.password) {
     return CE.PasswordMisMatchException.invoke('Cannot verify user password', password, this.scheme)
   }
 }
