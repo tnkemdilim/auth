@@ -297,16 +297,18 @@ class DatabaseSerializer {
    * @param  {Object}  user
    * @param  {String}  token
    * @param  {String}  type
+   * @param  {object}  columns
    *
    * @return {void}
    */
-  async saveToken (user, token, type) {
+  async saveToken (user, token, type, columns = {}) {
     const foreignKeyValue = user[this.primaryKey]
 
     const insertPayload = {
       token,
       type,
       is_revoked: false,
+      ...columns,
       [this.foreignKey]: foreignKeyValue
     }
 

@@ -229,11 +229,12 @@ class LucidSerializer {
    * @param  {Object}  user
    * @param  {String}  token
    * @param  {String}  type
+   * @param  {object}  columns
    *
    * @return {void}
    */
-  async saveToken (user, token, type) {
-    const insertPayload = { token, type, is_revoked: false }
+  async saveToken (user, token, type, columns = {}) {
+    const insertPayload = { token, type, is_revoked: false, ...columns }
     debug('saving token for %s user with %j payload', user.primaryKeyValue, insertPayload)
     await user.tokens().create(insertPayload)
   }

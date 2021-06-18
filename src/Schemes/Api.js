@@ -84,7 +84,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async generate (user) {
+  async generate (user, tokenType = 'api_token', columns = {}) {
     /**
      * Throw exception when user is not persisted to
      * database
@@ -94,14 +94,15 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Primary key value is missing for user')
     }
 
-    const plainToken = uuid.v4().replace(/-/g, '')
-    await this._serializerInstance.saveToken(user, plainToken, 'api_token')
+    const token = uuid.v4().replace(/-/g, '')
 
     /**
      * Encrypting the token before giving it to the
      * user.
      */
-    const token = this.Encryption.encrypt(plainToken)
+    const encryptedToken = this.Encryption.encrypt(token)
+    await this._serializerInstance.saveToken(user, encryptedToken, tokenType, columns)
+
     return { type: 'bearer', token }
   }
 
@@ -128,7 +129,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async check () {
+  async check (tokenType = 'api_token') {
     /**
      * User already exists for this request, so there is
      * no need to re-pull them from the database
@@ -146,8 +147,8 @@ class ApiScheme extends BaseTokenScheme {
      * Decrypting the token before querying
      * the db.
      */
-    const plainToken = this.Encryption.decrypt(token)
-    this.user = await this._serializerInstance.findByToken(plainToken, 'api_token')
+    const plainToken = this.Encryption.encrypt(token)
+    this.user = await this._serializerInstance.findByToken(plainToken, tokenType)
 
     /**
      * Throw exception when user is not found
