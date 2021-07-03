@@ -174,7 +174,7 @@ class ApiScheme extends BaseTokenScheme {
       throw CE.InvalidApiToken.invoke()
     }
 
-    const [tokenType, environment, ...token] = token.split('_');
+    const [tokenType, environment, ...tokens] = token.split('_');
     if (environment !== this.environment) {
       throw CE.InvalidApiToken.invoke()
     }
@@ -183,7 +183,7 @@ class ApiScheme extends BaseTokenScheme {
      * Decrypting the token before querying
      * the db.
      */
-    const plainToken = this.Encryption.decrypt(token.join(""))
+    const plainToken = this.Encryption.decrypt(tokens.join(""))
     this.user = await this._serializerInstance.findByToken(plainToken, tokenType)
 
     /**
