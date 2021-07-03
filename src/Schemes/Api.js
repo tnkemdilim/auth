@@ -169,7 +169,7 @@ class ApiScheme extends BaseTokenScheme {
       return true
     }
 
-    let token = this.getAuthHeader(['bearer', 'token'])
+    const token = this.getAuthHeader(['bearer', 'token'])
     if (!token) {
       throw CE.InvalidApiToken.invoke()
     }
