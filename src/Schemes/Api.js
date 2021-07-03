@@ -48,12 +48,12 @@ class ApiScheme extends BaseTokenScheme {
   /**
    * The token prefix.
    *
-   * @attribute tokenPrefix
+   * @attribute environment
    * @type {String|Null}
    * @readOnly
    */
-  get tokenPrefix() {
-    return _.get(this.apiOptions, 'tokenPrefix', '')
+  get environment() {
+    return _.get(this.apiOptions, 'environment', '')
   }
 
   /**
@@ -107,7 +107,15 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async generate(user, tokenType = 'api_token', columns = {}) {
+  async generate(user, tokenType = 'api', columns = {}) {
+    if (!tokenType || tokenType.length === 0) {
+      throw GE.RuntimeException.invoke('Token type cannot be empty')
+    }
+
+    if (!this.environment || this.environment.length === 0) {
+      throw GE.RuntimeException.invoke('Token prefix cannot be empty')
+    }
+
     /**
      * Throw exception when user is not persisted to
      * database
@@ -124,10 +132,7 @@ class ApiScheme extends BaseTokenScheme {
      * Encrypting the token before giving it to the
      * user.
      */
-    let token = this.Encryption.encrypt(plainToken)
-    if (this.tokenPrefix.length > 0) {
-      token = `${this.tokenPrefix}_${token}`
-    }
+    const token = `${tokenType}_${this.environment}_${this.Encryption.encrypt(plainToken)}`
 
     return { type: 'bearer', token }
   }
@@ -155,7 +160,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async check(tokenType = 'api_token') {
+  async check() {
     /**
      * User already exists for this request, so there is
      * no need to re-pull them from the database
@@ -169,16 +174,16 @@ class ApiScheme extends BaseTokenScheme {
       throw CE.InvalidApiToken.invoke()
     }
 
-    /**
-     * Strip away configured prefix from token.
-     */
-    token = token.replace(`${this.tokenPrefix}_`, '');
+    const [tokenType, environment, ...token] = token.split('_');
+    if (environment !== this.environment) {
+      throw CE.InvalidApiToken.invoke()
+    }
 
     /**
      * Decrypting the token before querying
      * the db.
      */
-    const plainToken = this.Encryption.decrypt(token)
+    const plainToken = this.Encryption.decrypt(token.join(""))
     this.user = await this._serializerInstance.findByToken(plainToken, tokenType)
 
     /**
