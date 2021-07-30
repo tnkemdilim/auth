@@ -24,7 +24,7 @@ const debug = require('debug')('adonis:auth')
  * @param {Object} Hash Hash provider
  */
 class DatabaseSerializer {
-  constructor (Hash) {
+  constructor(Hash) {
     this.Hash = Hash
     this._config = null
     this._queryCallback = null
@@ -42,7 +42,7 @@ class DatabaseSerializer {
    * @ignore
    * @static
    */
-  static get inject () {
+  static get inject() {
     return ['Adonis/Src/Hash']
   }
 
@@ -55,7 +55,7 @@ class DatabaseSerializer {
    *
    * @private
    */
-  _getQuery () {
+  _getQuery() {
     const query = this._Db.connection(this.connection).table(this.table)
 
     if (typeof (this._queryCallback) === 'function') {
@@ -75,7 +75,7 @@ class DatabaseSerializer {
    *
    * @private
    */
-  _getTokensQuery () {
+  _getTokensQuery() {
     return this._Db.connection(this.connection).table(this.tokensTable)
   }
 
@@ -93,7 +93,7 @@ class DatabaseSerializer {
    *
    * @private
    */
-  _selectTokens (user, tokens, inverse) {
+  _selectTokens(user, tokens, inverse) {
     const query = this._getTokensQuery().where(this.foreignKey, user[this.primaryKey])
 
     const tokensList = _.compact(_.castArray(tokens))
@@ -116,7 +116,7 @@ class DatabaseSerializer {
    * @type {String}
    * @readOnly
    */
-  get connection () {
+  get connection() {
     return this._config.connection || ''
   }
 
@@ -128,7 +128,7 @@ class DatabaseSerializer {
    * @type {String}
    * @readOnly
    */
-  get table () {
+  get table() {
     return this._config.table
   }
 
@@ -141,7 +141,7 @@ class DatabaseSerializer {
    * @type {String}
    * @readOnly
    */
-  get primaryKey () {
+  get primaryKey() {
     return this._config.primaryKey
   }
 
@@ -154,7 +154,7 @@ class DatabaseSerializer {
    * @type {String}
    * @readOnly
    */
-  get foreignKey () {
+  get foreignKey() {
     return this._config.foreignKey
   }
 
@@ -166,7 +166,7 @@ class DatabaseSerializer {
    * @type {String}
    * @readOnly
    */
-  get tokensTable () {
+  get tokensTable() {
     return this._config.tokensTable
   }
 
@@ -180,7 +180,7 @@ class DatabaseSerializer {
    *
    * @return {void}
    */
-  setConfig (config) {
+  setConfig(config) {
     this._config = config
   }
 
@@ -205,7 +205,7 @@ class DatabaseSerializer {
    * }).attempt()
    * ```
    */
-  query (callback) {
+  query(callback) {
     this._queryCallback = callback
     return this
   }
@@ -221,7 +221,7 @@ class DatabaseSerializer {
    *
    * @return {Object|Null}
    */
-  async findById (id) {
+  async findById(id) {
     debug('finding user with primary key as %s', id)
     return this._getQuery().where(this.primaryKey, id).first()
   }
@@ -236,7 +236,7 @@ class DatabaseSerializer {
    *
    * @return {Object|Null}
    */
-  async findByUid (uid) {
+  async findByUid(uid) {
     debug('finding user with %s as %s', this._config.uid, uid)
     return this._getQuery().where(this._config.uid, uid).first()
   }
@@ -253,7 +253,7 @@ class DatabaseSerializer {
    *
    * @return {Boolean}
    */
-  async validateCredentails (user, password) {
+  async validateCredentails(user, password) {
     if (!user || !user[this._config.password]) {
       return false
     }
@@ -268,10 +268,11 @@ class DatabaseSerializer {
    *
    * @param  {String}    token
    * @param  {String}    type
+   * @param  {object}    columns
    *
    * @return {Object|Null}
    */
-  async findByToken (token, type) {
+  async findByToken(token, type, columns = {}) {
     debug('finding user for %s token', token)
     const query = this._getQuery()
 
@@ -283,7 +284,7 @@ class DatabaseSerializer {
       .whereExists(function () {
         this
           .from(tokensTable)
-          .where({ token, type, is_revoked: false })
+          .where({ token, type, is_revoked: false, ...columns })
           .whereRaw(`${lhs} = ${rhs}`)
       }).first()
   }
@@ -301,7 +302,7 @@ class DatabaseSerializer {
    *
    * @return {void}
    */
-  async saveToken (user, token, type, columns = {}) {
+  async saveToken(user, token, type, columns = {}) {
     const foreignKeyValue = user[this.primaryKey]
 
     const insertPayload = {
@@ -328,7 +329,7 @@ class DatabaseSerializer {
    *
    * @return {Number}           Number of impacted rows
    */
-  async revokeTokens (user, tokens = null, inverse = false) {
+  async revokeTokens(user, tokens = null, inverse = false) {
     const query = this._selectTokens(user, tokens, inverse)
     return query.update({ is_revoked: true })
   }
@@ -345,7 +346,7 @@ class DatabaseSerializer {
    *
    * @return {Number}           Number of impacted rows
    */
-  async deleteTokens (user, tokens = null, inverse = false) {
+  async deleteTokens(user, tokens = null, inverse = false) {
     const query = this._selectTokens(user, tokens, inverse)
     return query.delete()
   }
@@ -362,7 +363,7 @@ class DatabaseSerializer {
    * @return {Object}
    * - { rows: rows, toJSON: function () {} }
    */
-  async listTokens (user, type) {
+  async listTokens(user, type) {
     const query = this._getTokensQuery()
 
     const rows = await query
@@ -371,7 +372,7 @@ class DatabaseSerializer {
 
     return {
       rows: rows,
-      toJSON () {
+      toJSON() {
         return this.rows || []
       }
     }

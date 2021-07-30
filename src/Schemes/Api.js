@@ -15,6 +15,7 @@ const _ = require('lodash')
 
 const BaseTokenScheme = require('./BaseToken')
 const CE = require('../Exceptions')
+const DELIMITER = ":~~:";
 
 /**
  * This scheme allows to make use of Github style personal API tokens
@@ -125,7 +126,7 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Primary key value is missing for user')
     }
 
-    const plainToken = uuid.v4().replace(/-/g, '')
+    const plainToken = `${userId}${DELIMITER}${uuid.v4().replace(/-/g, '')}`;
     await this._serializerInstance.saveToken(user, plainToken, tokenType, columns)
 
     /**
@@ -183,8 +184,9 @@ class ApiScheme extends BaseTokenScheme {
      * Decrypting the token before querying
      * the db.
      */
-    const plainToken = this.Encryption.decrypt(tokens.join(""))
-    this.user = await this._serializerInstance.findByToken(plainToken, tokenType)
+    const foreignKey = this._serializerInstance.foreignKey;
+    const [userId, plainToken] = this.Encryption.decrypt(tokens.join("")).split(DELIMITER)
+    this.user = await this._serializerInstance.findByToken(plainToken, tokenType, { [foreignKey]: userId })
 
     /**
      * Throw exception when user is not found

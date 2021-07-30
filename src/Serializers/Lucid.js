@@ -24,7 +24,7 @@ const debug = require('debug')('adonis:auth')
  * @param {Object} Hash Hash provider
  */
 class LucidSerializer {
-  constructor (Hash) {
+  constructor(Hash) {
     this.Hash = Hash
     this._config = null
     this._Model = null
@@ -42,7 +42,7 @@ class LucidSerializer {
    * @ignore
    * @static
    */
-  static get inject () {
+  static get inject() {
     return ['Adonis/Src/Hash']
   }
 
@@ -57,7 +57,7 @@ class LucidSerializer {
    *
    * @private
    */
-  _getQuery () {
+  _getQuery() {
     const query = this._Model.query()
     if (typeof (this._queryCallback) === 'function') {
       this._queryCallback(query)
@@ -80,7 +80,7 @@ class LucidSerializer {
    *
    * @private
    */
-  _selectTokens (user, tokens, inverse) {
+  _selectTokens(user, tokens, inverse) {
     const query = user.tokens()
     const method = inverse ? 'whereNotIn' : 'whereIn'
 
@@ -103,8 +103,20 @@ class LucidSerializer {
    * @type {String}
    * @readOnly
    */
-  get primaryKey () {
+  get primaryKey() {
     return this._Model.primaryKey
+  }
+
+  /**
+   * Reference to the foreign key used for fetching the unique value
+   * for a given user.
+   *
+   * @attribute foreignKey
+   * @type {String}
+   * @readOnly
+   */
+  get foreignKey() {
+    return this._Model.foreignKey
   }
 
   /**
@@ -117,7 +129,7 @@ class LucidSerializer {
    *
    * @return {void}
    */
-  setConfig (config) {
+  setConfig(config) {
     this._config = config
     this._Model = ioc.make(this._config.model)
   }
@@ -143,7 +155,7 @@ class LucidSerializer {
    * }).attempt()
    * ```
    */
-  query (callback) {
+  query(callback) {
     this._queryCallback = callback
     return this
   }
@@ -159,7 +171,7 @@ class LucidSerializer {
    *
    * @return {User|Null}
    */
-  async findById (id) {
+  async findById(id) {
     debug('finding user with primary key as %s', id)
     return this._getQuery().where(this.primaryKey, id).first()
   }
@@ -174,7 +186,7 @@ class LucidSerializer {
    *
    * @return {Model|Null} The model instance or `null`
    */
-  async findByUid (uid) {
+  async findByUid(uid) {
     debug('finding user with %s as %s', this._config.uid, uid)
     return this._getQuery().where(this._config.uid, uid).first()
   }
@@ -190,7 +202,7 @@ class LucidSerializer {
    *
    * @return {Boolean}
    */
-  async validateCredentails (user, password) {
+  async validateCredentails(user, password) {
     if (!user || !user[this._config.password]) {
       return false
     }
@@ -205,16 +217,17 @@ class LucidSerializer {
    *
    * @param  {String}    token
    * @param  {String}    type
+   * @param  {object}    columns
    *
    * @return {Object|Null}
    */
-  async findByToken (token, type) {
+  async findByToken(token, type, columns = {}) {
     debug('finding user for %s token', token)
 
     return this
       ._getQuery()
       .whereHas('tokens', function (builder) {
-        builder.where({ token, type, is_revoked: false })
+        builder.where({ token, type, is_revoked: false, ...columns })
       }).first()
   }
 
@@ -233,7 +246,7 @@ class LucidSerializer {
    *
    * @return {void}
    */
-  async saveToken (user, token, type, columns = {}) {
+  async saveToken(user, token, type, columns = {}) {
     const insertPayload = { token, type, is_revoked: false, ...columns }
     debug('saving token for %s user with %j payload', user.primaryKeyValue, insertPayload)
     await user.tokens().create(insertPayload)
@@ -250,7 +263,7 @@ class LucidSerializer {
    *
    * @return {Number}           Number of impacted rows
    */
-  async revokeTokens (user, tokens = null, inverse = false) {
+  async revokeTokens(user, tokens = null, inverse = false) {
     const query = this._selectTokens(user, tokens, inverse)
     return query.update({ is_revoked: true })
   }
@@ -266,7 +279,7 @@ class LucidSerializer {
    *
    * @return {Number}           Number of impacted rows
    */
-  async deleteTokens (user, tokens = null, inverse = false) {
+  async deleteTokens(user, tokens = null, inverse = false) {
     const query = this._selectTokens(user, tokens, inverse)
     return query.delete()
   }
@@ -282,7 +295,7 @@ class LucidSerializer {
    *
    * @return {Object}
    */
-  async listTokens (user, type) {
+  async listTokens(user, type) {
     return user.tokens().where({ type, is_revoked: false }).fetch()
   }
 }
