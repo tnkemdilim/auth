@@ -47,17 +47,6 @@ class ApiScheme extends BaseTokenScheme {
   }
 
   /**
-   * The token prefix.
-   *
-   * @attribute environment
-   * @type {String|Null}
-   * @readOnly
-   */
-  get environment() {
-    return _.get(this.apiOptions, 'environment', '')
-  }
-
-  /**
    * Attempt to valid the user credentials and then
    * generates a new token for it.
    *
@@ -113,10 +102,6 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Token type cannot be empty')
     }
 
-    if (!this.environment || this.environment.length === 0) {
-      throw GE.RuntimeException.invoke('Token prefix cannot be empty')
-    }
-
     /**
      * Throw exception when user is not persisted to
      * database
@@ -133,8 +118,7 @@ class ApiScheme extends BaseTokenScheme {
      * Encrypting the token before giving it to the
      * user.
      */
-    const token = `${tokenType}_${this.environment}_${this.Encryption.encrypt(
-      `${userId}${DELIMITER}${plainToken}`)}`
+    const token = `${tokenType}_${this.Encryption.encrypt(`${userId}${DELIMITER}${plainToken}`)}`
 
     return { type: 'bearer', token }
   }
@@ -176,10 +160,7 @@ class ApiScheme extends BaseTokenScheme {
       throw CE.InvalidApiToken.invoke()
     }
 
-    const [tokenType, environment, ...tokens] = token.split('_');
-    if (environment !== this.environment) {
-      throw CE.InvalidApiToken.invoke()
-    }
+    const [tokenType, ...tokens] = token.split('_');
 
     /**
      * Decrypting the token before querying
