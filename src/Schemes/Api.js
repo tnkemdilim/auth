@@ -134,10 +134,9 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Primary key value is missing for user')
     }
 
-    const plainToken = uuid.v4().replace(/-/g, '');
-    await this._serializerInstance.saveToken(user, plainToken, tokenType, {
-      ...columns, environment,
-    })
+    const plainToken = uuid.v4().replace(/-/g, '')
+    const moreColumns = { ...columns, environment, group: this.group }
+    await this._serializerInstance.saveToken(user, plainToken, tokenType, moreColumns)
 
     /**
      * Encrypting the token before giving it to the
