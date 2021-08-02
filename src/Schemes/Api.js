@@ -58,6 +58,17 @@ class ApiScheme extends BaseTokenScheme {
   }
 
   /**
+   * The token environment.
+   *
+   * @attribute environment
+   * @type {String|Null}
+   * @readOnly
+   */
+  get environment() {
+    return _.get(this.apiOptions, 'environment', '')
+  }
+
+  /**
    * Attempt to valid the user credentials and then
    * generates a new token for it.
    *
@@ -108,7 +119,7 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async generate(user, tokenType = 'api', environment = 'live', columns = {}) {
+  async generate(user, tokenType = 'api', columns = {}) {
     if (!tokenType || tokenType.length === 0) {
       throw GE.RuntimeException.invoke('Token type cannot be empty')
     }
@@ -117,11 +128,11 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Token group cannot be empty')
     }
 
-    if (!environment || environment.length === 0) {
+    if (!this.environment || this.environment.length === 0) {
       throw GE.RuntimeException.invoke('Token environment cannot be empty')
     }
 
-    if (environment.includes('_')) {
+    if (this.environment.includes('_')) {
       throw GE.RuntimeException.invoke('Token environment cannot contain underscores');
     }
 
@@ -135,7 +146,7 @@ class ApiScheme extends BaseTokenScheme {
     }
 
     const plainToken = uuid.v4().replace(/-/g, '')
-    const moreColumns = { ...columns, environment, group: this.group }
+    const moreColumns = { ...columns, environment: this.environment, group: this.group }
     await this._serializerInstance.saveToken(user, plainToken, tokenType, moreColumns)
 
     /**
@@ -143,7 +154,7 @@ class ApiScheme extends BaseTokenScheme {
      * user.
      */
     const encryptedToken = this.Encryption.encrypt(`${userId}${DELIMITER}${plainToken}`);
-    const token = `${tokenType}_${environment}_${encryptedToken}`
+    const token = `${tokenType}_${this.environment}_${encryptedToken}`
 
     return { type: 'bearer', token }
   }
@@ -186,7 +197,7 @@ class ApiScheme extends BaseTokenScheme {
     }
 
     const [tokenType, environment, ...tokens] = token.split('_');
-    if (group !== this.group) {
+    if (environment !== this.environment) {
       throw CE.InvalidApiToken.invoke()
     }
 
