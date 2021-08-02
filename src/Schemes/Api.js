@@ -47,17 +47,6 @@ class ApiScheme extends BaseTokenScheme {
   }
 
   /**
-   * The token group.
-   *
-   * @attribute group
-   * @type {String|Null}
-   * @readOnly
-   */
-  get group() {
-    return _.get(this.apiOptions, 'group', null)
-  }
-
-  /**
    * The token environment.
    *
    * @attribute environment
@@ -124,10 +113,6 @@ class ApiScheme extends BaseTokenScheme {
       throw GE.RuntimeException.invoke('Token type cannot be empty')
     }
 
-    if (!this.group || this.group.length === 0) {
-      throw GE.RuntimeException.invoke('Token group cannot be empty')
-    }
-
     if (!this.environment || this.environment.length === 0) {
       throw GE.RuntimeException.invoke('Token environment cannot be empty')
     }
@@ -146,7 +131,7 @@ class ApiScheme extends BaseTokenScheme {
     }
 
     const plainToken = uuid.v4().replace(/-/g, '')
-    const moreColumns = { ...columns, environment: this.environment, group: this.group }
+    const moreColumns = { ...columns, environment: this.environment }
     await this._serializerInstance.saveToken(user, plainToken, tokenType, moreColumns)
 
     /**
@@ -209,7 +194,6 @@ class ApiScheme extends BaseTokenScheme {
     const [userId, plainToken] = this.Encryption.decrypt(tokens.join("")).split(DELIMITER)
     this.user = await this._serializerInstance.findByToken(plainToken, tokenType, {
       [foreignKey]: userId,
-      group: this.group,
       environment,
     })
 
