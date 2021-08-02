@@ -135,7 +135,9 @@ class ApiScheme extends BaseTokenScheme {
     }
 
     const plainToken = uuid.v4().replace(/-/g, '');
-    await this._serializerInstance.saveToken(user, plainToken, tokenType, columns)
+    await this._serializerInstance.saveToken(user, plainToken, tokenType, {
+      ...columns, environment,
+    })
 
     /**
      * Encrypting the token before giving it to the
