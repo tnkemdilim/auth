@@ -47,6 +47,17 @@ class ApiScheme extends BaseTokenScheme {
   }
 
   /**
+   * The token group.
+   *
+   * @attribute group
+   * @type {String|Null}
+   * @readOnly
+   */
+  get group() {
+    return _.get(this.apiOptions, 'group', null)
+  }
+
+  /**
    * Attempt to valid the user credentials and then
    * generates a new token for it.
    *
@@ -97,9 +108,21 @@ class ApiScheme extends BaseTokenScheme {
    * }
    * ```
    */
-  async generate(user, tokenType = 'api', columns = {}) {
+  async generate(user, tokenType = 'api', environment = 'live', columns = {}) {
     if (!tokenType || tokenType.length === 0) {
       throw GE.RuntimeException.invoke('Token type cannot be empty')
+    }
+
+    if (!this.group || this.group.length === 0) {
+      throw GE.RuntimeException.invoke('Token group cannot be empty')
+    }
+
+    if (!environment || environment.length === 0) {
+      throw GE.RuntimeException.invoke('Token environment cannot be empty')
+    }
+
+    if (environment.includes('_')) {
+      throw GE.RuntimeException.invoke('Token environment cannot contain underscores');
     }
 
     /**
@@ -118,7 +141,8 @@ class ApiScheme extends BaseTokenScheme {
      * Encrypting the token before giving it to the
      * user.
      */
-    const token = `${tokenType}_${this.Encryption.encrypt(`${userId}${DELIMITER}${plainToken}`)}`
+    const encryptedToken = this.Encryption.encrypt(`${userId}${DELIMITER}${plainToken}`);
+    const token = `${tokenType}_${environment}_${encryptedToken}`
 
     return { type: 'bearer', token }
   }
@@ -160,7 +184,10 @@ class ApiScheme extends BaseTokenScheme {
       throw CE.InvalidApiToken.invoke()
     }
 
-    const [tokenType, ...tokens] = token.split('_');
+    const [tokenType, environment, ...tokens] = token.split('_');
+    if (group !== this.group) {
+      throw CE.InvalidApiToken.invoke()
+    }
 
     /**
      * Decrypting the token before querying
@@ -168,7 +195,11 @@ class ApiScheme extends BaseTokenScheme {
      */
     const foreignKey = this._serializerInstance.foreignKey;
     const [userId, plainToken] = this.Encryption.decrypt(tokens.join("")).split(DELIMITER)
-    this.user = await this._serializerInstance.findByToken(plainToken, tokenType, { [foreignKey]: userId })
+    this.user = await this._serializerInstance.findByToken(plainToken, tokenType, {
+      [foreignKey]: userId,
+      group: this.group,
+      environment,
+    })
 
     /**
      * Throw exception when user is not found
